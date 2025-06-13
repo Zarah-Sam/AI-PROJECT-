@@ -1,0 +1,107 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyP1vEOzjoxkHZqVlN7Gm7EM",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/Zarah-Sam/AI-PROJECT-/blob/main/AI%20project%20\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "68Sk-vI5H2BJ"
+      },
+      "outputs": [],
+      "source": [
+        "\n",
+        "# ✅ Install and import everything needed (Colab has most by default)\n",
+        "import cv2\n",
+        "import numpy as np\n",
+        "import matplotlib.pyplot as plt\n",
+        "from google.colab import files\n",
+        "\n",
+        "# ✅ Upload your reference and test images\n",
+        "print(\"📂 Please upload a CLEAR EMPTY BIN image\")\n",
+        "empty_upload = files.upload()\n",
+        "\n",
+        "print(\"\\n📂 Please upload a CLEAR FULL BIN image\")\n",
+        "full_upload = files.upload()\n",
+        "\n",
+        "print(\"\\n📂 Now upload a TEST BIN image to classify\")\n",
+        "test_upload = files.upload()\n",
+        "\n",
+        "# ✅ Get filenames\n",
+        "empty_img_path = list(empty_upload.keys())[0]\n",
+        "full_img_path = list(full_upload.keys())[0]\n",
+        "test_img_path = list(test_upload.keys())[0]\n",
+        "\n",
+        "# ✅ Read and resize to same size for comparison\n",
+        "def read_and_resize(path):\n",
+        "    img = cv2.imread(path)\n",
+        "    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # Convert to grayscale for simplicity\n",
+        "    img = cv2.resize(img, (200, 200))  # Resize to common size\n",
+        "    return img\n",
+        "\n",
+        "empty_img = read_and_resize(empty_img_path)\n",
+        "full_img = read_and_resize(full_img_path)\n",
+        "test_img = read_and_resize(test_img_path)\n",
+        "\n",
+        "# ✅ Show the three images side-by-side for confirmation\n",
+        "fig, axs = plt.subplots(1, 3, figsize=(12, 4))\n",
+        "axs[0].imshow(empty_img, cmap='gray')\n",
+        "axs[0].set_title('Reference: Empty Bin')\n",
+        "axs[0].axis('off')\n",
+        "\n",
+        "axs[1].imshow(full_img, cmap='gray')\n",
+        "axs[1].set_title('Reference: Full Bin')\n",
+        "axs[1].axis('off')\n",
+        "\n",
+        "axs[2].imshow(test_img, cmap='gray')\n",
+        "axs[2].set_title('Test Image')\n",
+        "axs[2].axis('off')\n",
+        "\n",
+        "plt.show()\n",
+        "\n",
+        "# ✅ Compare using simple pixel-wise Mean Squared Error (MSE)\n",
+        "def mse(imgA, imgB):\n",
+        "    err = np.sum((imgA.astype(\"float\") - imgB.astype(\"float\")) ** 2)\n",
+        "    err /= float(imgA.shape[0] * imgA.shape[1])\n",
+        "    return err\n",
+        "\n",
+        "error_to_empty = mse(test_img, empty_img)\n",
+        "error_to_full = mse(test_img, full_img)\n",
+        "\n",
+        "print(\"\\n🔍 Similarity check (Higher means MORE SIMILAR):\")\n",
+        "print(f\" - Compared to EMPTY: {error_to_empty:.2f}\")\n",
+        "print(f\" - Compared to FULL : {error_to_full:.2f}\")\n",
+        "\n",
+        "# ✅ Final decision\n",
+        "if error_to_empty > error_to_full:\n",
+        "    print(\"\\n✅ RESULT: Bin is EMPTY ✔️\")\n",
+        "else:\n",
+        "    print(\"\\n🟥 RESULT: Bin is FULL 🚮\")"
+      ]
+    }
+  ]
+}
